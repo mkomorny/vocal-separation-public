@@ -1,0 +1,63 @@
+HOW TO USE: vocal-separation
+==================================================
+
+PURPOSE
+  Dedicated State-of-the-Art AI vocal separation and studio acapella extraction
+  using Mel-Band RoFormer (Ranked #1 vocal isolation model, 0% bleed), Meta
+  Demucs v4 Fine-Tuned, and Reverb_HQ de-reverberation.
+
+CAPABILITIES
+  - Mel-Band RoFormer vocal extraction: maximum purity, zero bleed from drums/guitars, preserves high-frequency breath (>10 kHz)
+  - Meta Demucs v4 FT: fast 2-stem vocal/instrumental split with equivariant phase stabilization
+  - Vocal De-Reverberation (Reverb_HQ): strips room ambience into dry vocal (`vocals_dry.wav`) and reverb tail (`reverb.wav`)
+  - Two-Stage Studio Acapella: RoFormer instrumental removal + Reverb_HQ de-reverb for bone-dry studio vocals
+  - Strict output folder placement directly inside the source audio file's folder (`{song_dir}/{song}_vocals/`)
+  - Interactive vocal method inquiry with strength recaps prior to processing
+
+USE CASES
+  - Extract pristine acapellas for vocal remixing, sampling, bootlegs, or mashups
+  - Clean up live vocal recordings by removing drum bleed, guitar spill, and room reflections
+  - Generate bone-dry vocal tracks for custom re-amping, pitch correction, or spatial processing
+  - Create high-quality karaoke or instrumental backing tracks
+  - Extract lead vocals to train voice clone models with cartesia-voice-clone-extractor
+
+IDEAS
+  - Chain with cartesia-voice-clone-extractor: harvest pristine speaker reference audio with zero background music
+  - Pair with vocal-to-synth-lead: convert the isolated acapella into a monophonic MIDI synth melody
+  - Strip room reflections with de-reverb, then re-reverb with vintage plates or spring reverbs in your DAW
+  - Use the isolated `reverb.wav` track as a sound design texture or ghost vocal layer in a breakdown
+  - Process podcast and interview audio to remove background café or room echo
+
+PROMPTS YOU CAN PASTE
+  Isolate the vocals from "C:\Audio\Song.mp3" using Mel-Band RoFormer.
+
+  Extract a bone-dry acapella from "C:\Music\Track.wav" with zero room reverb.
+
+  Can you separate vocals and backing track using Demucs FT?
+
+  Remove the instrumental from this song and give me both dry vocals and the reverb tail.
+
+  Extract an acapella from this track for a voice clone dataset.
+
+EXAMPLE FLOW
+  You:   Extract an acapella from "C:\Music\Song.wav".
+  Model: Which vocal separation method would you like to use?
+         1. (Recommended) Mel-Band RoFormer (`roformer`) — SOTA zero bleed, crisp air.
+         2. Meta Demucs v4 FT (`demucs-ft`) — Fast, phase-stabilized 2-stem.
+         3. Vocal De-Reverberation (`de-reverb`) — Strips room echo into dry + reverb.
+         4. RoFormer + De-Reverb Dual Pass (`roformer-dereverb`) — Ultimate bone-dry acapella.
+         5. Standard Baseline (`standard`) — Fast preview.
+  You:   Let's do RoFormer + De-Reverb!
+  Model: [Runs two-pass pipeline with CUDA acceleration]
+         Results saved in: C:\Music\Song_vocals\
+         - Isolated Vocal: [vocals.wav](file:///C:/Music/Song_vocals/vocals.wav)
+         - Bone-Dry Vocal: [vocals_dry.wav](file:///C:/Music/Song_vocals/vocals_dry.wav)
+         - Room Reverb:    [reverb.wav](file:///C:/Music/Song_vocals/reverb.wav)
+         - Manifest:       [stems_manifest.json](file:///C:/Music/Song_vocals/stems_manifest.json)
+
+DEFAULT GOALS IF YOU DON'T NAME ONE
+  1. Verify the audio file path and file format.
+  2. Ask or confirm the preferred vocal method (defaulting to Mel-Band RoFormer).
+  3. Execute `separate_stems.py --mode vocals --vocal-method <method>`.
+  4. Save audio outputs into `{song_directory}/{song_name}_vocals/`.
+  5. Present clickable markdown links to `vocals.wav` (and `vocals_dry.wav` / `reverb.wav` if de-reverb).
